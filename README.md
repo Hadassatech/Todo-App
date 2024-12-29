@@ -1,3 +1,7 @@
+
+
+![GIFMaker_me (4)](https://github.com/user-attachments/assets/9b81af7a-5e07-4423-aef6-a51f06c8ebde)
+
 # To-Do App
 
 This project is a simple To-Do list application, where you can add, edit, delete, and view tasks. It consists of a React frontend and an Express backend. The frontend communicates with the backend through an API to manage tasks. The project also uses Material UI for design components.

@@ -6,47 +6,66 @@ import './TaskList.css';
 
 const TaskList = () => {
   const [tasks, setTasks] = useState([]);
-  const API_URL = process.env.REACT_APP_API_URL; 
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const API_URL = process.env.REACT_APP_API_URL;
 
   // load tasks
   useEffect(() => {
-    axios.get(`${API_URL}/tasks`) 
-      .then(response => {
+    const fetchTasks = async () => {
+      try {
+        const response = await axios.get(`${API_URL}/tasks`);
         setTasks(response.data);
-      })
-      .catch(error => console.error('Error fetching tasks:', error));
+      } catch (error) {
+        setError('Error fetching tasks');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchTasks();
   }, []);
 
   // add a new task
-  const handleAddTask = (newTask) => {
-    axios.post(`${API_URL}/tasks`, newTask)  
-      .then(response => {
-        setTasks([...tasks, response.data]);
-      })
-      .catch(error => console.error('Error adding task:', error));
+  const handleAddTask = async (newTask) => {
+    try {
+      const response = await axios.post(`${API_URL}/tasks`, newTask);
+      setTasks([...tasks, response.data]);
+    } catch (error) {
+      setError('Error adding task');
+    }
   };
 
   // update task
-  const handleEditTask = (updatedTask) => {
-    axios.put(`${API_URL}/tasks/${updatedTask.task_id}`, updatedTask)
-      .then(response => {
-        const updatedTasks = tasks.map(task =>
-          task.task_id === updatedTask.task_id ? response.data : task
-        );
-        setTasks(updatedTasks);
-      })
-      .catch(error => console.error('Error updating task:', error));
+  const handleEditTask = async (updatedTask) => {
+    try {
+      const response = await axios.put(`${API_URL}/tasks/${updatedTask.task_id}`, updatedTask);
+      const updatedTasks = tasks.map(task =>
+        task.task_id === updatedTask.task_id ? response.data : task
+      );
+      setTasks(updatedTasks);
+    } catch (error) {
+      setError('Error updating task');
+    }
   };
 
   // delete task
-  const handleDeleteTask = (taskId) => {
-    axios.delete(`${API_URL}/tasks/${taskId}`) 
-      .then(() => {
-        const updatedTasks = tasks.filter(task => task.task_id !== taskId);
-        setTasks(updatedTasks);
-      })
-      .catch(error => console.error('Error deleting task:', error));
+  const handleDeleteTask = async (taskId) => {
+    try {
+      await axios.delete(`${API_URL}/tasks/${taskId}`);
+      const updatedTasks = tasks.filter(task => task.task_id !== taskId);
+      setTasks(updatedTasks);
+    } catch (error) {
+      setError('Error deleting task');
+    }
   };
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>{error}</div>;
+  }
 
   return (
     <div className="task-list-container">
